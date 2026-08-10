@@ -21,7 +21,29 @@ public class AppDbContext : IdentityDbContext<AppUser>   // no <Guid> needed now
             .HasOne(u => u.Profile)
             .WithOne(p => p.User)
             .HasForeignKey<UserProfile>(p => p.UserId);
+
+        modelBuilder.Entity<AssessmentQuestion>()
+    .HasKey(q => q.QuestionId);
+
+        modelBuilder.Entity<AssessmentAttempt>()
+            .HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId);
+
+        modelBuilder.Entity<AssessmentAnswer>()
+            .HasOne(a => a.Attempt)
+            .WithMany(at => at.Answers)
+            .HasForeignKey(a => a.AttemptId);
+
+        modelBuilder.Entity<AssessmentResult>()
+            .HasOne(r => r.Attempt)
+            .WithOne(a => a.Result)
+            .HasForeignKey<AssessmentResult>(r => r.AttemptId);
     }
 
     public DbSet<UserProfile> UserProfiles { get; set; }
+    public DbSet<AssessmentQuestion> AssessmentQuestions { get; set; }
+    public DbSet<AssessmentAttempt> AssessmentAttempts { get; set; }
+    public DbSet<AssessmentAnswer> AssessmentAnswers { get; set; }
+    public DbSet<AssessmentResult> AssessmentResults { get; set; }
 }
