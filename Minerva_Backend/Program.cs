@@ -57,7 +57,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpClient<IScoringService, ScoringService>(client =>
 {
-    client.BaseAddress = new Uri("http://localhost:8000"); ;
+    client.BaseAddress = new Uri("https://minerva-microservices.onrender.com"); ;
 });
 
 var app = builder.Build();
