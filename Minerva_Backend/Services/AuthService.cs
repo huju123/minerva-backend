@@ -93,7 +93,7 @@ namespace Minerva_Backend.Services
                 {
                     Data = null,
                     Message = "Invalid credentials, Please try again.",
-                    Status = false, 
+                    Status = false,
                 };
 
             var token = await JwtTokenGenerator.GenerateJWTKey(_configuration, existingUser);
@@ -116,7 +116,5 @@ namespace Minerva_Backend.Services
                 };
             }
         }
-
-
     }
 }

@@ -6,6 +6,7 @@ using Minerva_Backend.Data;
 using Minerva_Backend.IServices;
 using Minerva_Backend.Models;
 using Minerva_Backend.Services;
+using System.Net.Sockets;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthService, AuthService>(); 
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IScoringService, ScoringService>();
+builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -51,6 +54,11 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
+
+builder.Services.AddHttpClient<IScoringService, ScoringService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:8000"); ;
+});
 
 var app = builder.Build();
 

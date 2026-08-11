@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Minerva_Backend.DTO.Profile;
+using Minerva_Backend.DTO.Assessment;
 using Minerva_Backend.IServices;
 using System.Security.Claims;
 
@@ -9,13 +9,13 @@ namespace Minerva_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProfileController(IProfileService _profileService) : ControllerBase
+    public class AssessmentController(IAssessmentService _assessmentService) : ControllerBase
     {
         private string? GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         [Authorize]
-        [HttpGet("GetProfile")]
-        public async Task<IActionResult> GetProfileAsync()
+        [HttpGet("StartAssessment")]
+        public async Task<IActionResult> StartAssessmentAsync()
         {
             var userId = GetUserId();
             if (userId == null)
@@ -23,7 +23,7 @@ namespace Minerva_Backend.Controllers
                 return Unauthorized();
             }
 
-            var result = await _profileService.GetProfile(userId);
+            var result = await _assessmentService.StartAssessment(userId);
             if (!result.Status)
             {
                 return BadRequest(result);
@@ -32,8 +32,8 @@ namespace Minerva_Backend.Controllers
         }
 
         [Authorize]
-        [HttpPut("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfileAsync([FromBody] UpdateProfileDto dto)
+        [HttpPost("SubmitAssessment")]
+        public async Task<IActionResult> SubmitAssessmentAsync([FromBody] SubmitAssessmentDTO dto)
         {
             var userId = GetUserId();
             if (userId == null)
@@ -41,7 +41,7 @@ namespace Minerva_Backend.Controllers
                 return Unauthorized();
             }
 
-            var result = await _profileService.UpdateProfile(userId, dto);
+            var result = await _assessmentService.SubmitAssessment(userId, dto);
             if (!result.Status)
             {
                 return BadRequest(result);
@@ -50,8 +50,8 @@ namespace Minerva_Backend.Controllers
         }
 
         [Authorize]
-        [HttpPost("UpdateJourney")]
-        public async Task<IActionResult> UpdateJourneyAsync([FromBody] UpdateJourneyDTO dto)
+        [HttpGet("GetAssessmentResult/{attemptId}")]
+        public async Task<IActionResult> GetAssessmentResultAsync(string attemptId)
         {
             var userId = GetUserId();
             if (userId == null)
@@ -59,7 +59,7 @@ namespace Minerva_Backend.Controllers
                 return Unauthorized();
             }
 
-            var result = await _profileService.UpdateJourney(userId, dto);
+            var result = await _assessmentService.GetResult(userId, attemptId);
             if (!result.Status)
             {
                 return BadRequest(result);
@@ -68,4 +68,3 @@ namespace Minerva_Backend.Controllers
         }
     }
 }
-
