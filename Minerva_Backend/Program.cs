@@ -60,6 +60,20 @@ builder.Services.AddHttpClient<IScoringService, ScoringService>(client =>
     client.BaseAddress = new Uri("https://minerva-microservices.onrender.com"); ;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5173",     // Vite dev server (adjust if using CRA: 3000)
+                "https://your-frontend-domain.com"  // production frontend URL once deployed
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -75,6 +89,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
