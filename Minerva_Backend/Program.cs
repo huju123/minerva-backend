@@ -17,6 +17,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IScoringService, ScoringService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
+builder.Services.AddScoped<ICareerService, CareerService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -57,7 +58,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpClient<IScoringService, ScoringService>(client =>
 {
-    client.BaseAddress = new Uri("https://minerva-microservices.onrender.com"); ;
+    client.BaseAddress = new Uri("https://minerva-microservices.onrender.com"); 
+});
+builder.Services.AddHttpClient<ICareerMatchingService, CareerMatchingService>(client =>
+{
+    client.BaseAddress = new Uri("https://minerva-microservices.onrender.com");
 });
 
 builder.Services.AddCors(options =>
