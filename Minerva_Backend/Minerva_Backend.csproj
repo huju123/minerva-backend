@@ -8,7 +8,6 @@
 
 <ItemGroup>
     <Folder Include="MIdddlewares\" />
-    <Folder Include="SeedData\" />
 </ItemGroup>
 
 <ItemGroup>

@@ -80,6 +80,7 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await Minerva_Backend.Helpers.AssessmentSeeder.SeedAssessmentQuestions(dbContext);
+    await Minerva_Backend.Helpers.CareerSeeder.SeedCareers(dbContext);
 }
 
 // Configure the HTTP request pipeline.
