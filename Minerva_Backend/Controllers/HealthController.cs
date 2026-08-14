@@ -1,19 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Minerva_Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("health")]
     [ApiController]
     public class HealthController : ControllerBase
     {
-        [HttpGet("health")]
+        [HttpGet]
         public IActionResult Get()
         {
             return Ok(new
             {
                 status = "healthy"
             });
+        }
+
+        [HttpHead]
+        public IActionResult Head()
+        {
+            return Ok();
         }
     }
 }
