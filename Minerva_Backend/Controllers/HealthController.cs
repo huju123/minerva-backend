@@ -7,5 +7,13 @@ namespace Minerva_Backend.Controllers
     [ApiController]
     public class HealthController : ControllerBase
     {
+        [HttpGet("health")]
+        public IActionResult Get()
+        {
+            return Ok(new
+            {
+                status = "healthy"
+            });
+        }
     }
 }
