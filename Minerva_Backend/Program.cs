@@ -60,13 +60,16 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+var microserviceUrl = builder.Configuration["MicroserviceBaseUrl"]
+    ?? throw new InvalidOperationException("MicroserviceBaseUrl is not configured.");
+
 builder.Services.AddHttpClient<IScoringService, ScoringService>(client =>
 {
-    client.BaseAddress = new Uri("https://minerva-microservices.onrender.com"); 
+    client.BaseAddress = new Uri(microserviceUrl);
 });
 builder.Services.AddHttpClient<ICareerMatchingService, CareerMatchingService>(client =>
 {
-    client.BaseAddress = new Uri("https://minerva-microservices.onrender.com");
+    client.BaseAddress = new Uri(microserviceUrl);
 });
 
 builder.Services.AddCors(options =>
