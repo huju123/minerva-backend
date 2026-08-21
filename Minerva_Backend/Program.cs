@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using Minerva_Backend.Data;
 using Minerva_Backend.IServices;
 using Minerva_Backend.Models;
 using Minerva_Backend.Services;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -13,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>(); 
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IScoringService, ScoringService>();
@@ -69,17 +73,37 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",     // Vite dev server (adjust if using CRA: 3000)
-                "https://your-frontend-domain.com"  // production frontend URL once deployed
-            )
+        var origins = new List<string> { "http://localhost:5173" };
+
+        var additionalOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (additionalOrigins != null)
+        {
+            origins.AddRange(additionalOrigins);
+        }
+
+        policy.WithOrigins(origins.ToArray())
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
     });
 });
 
+// builder.Services.AddOpenApi();
+
+// Configure port for hosting platforms that set the PORT env var (Render, Railway, etc.)
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://+:{port}");
+}
+
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -92,6 +116,17 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
 
+}
+
+// Support reverse-proxy / load-balancer TLS termination (X-Forwarded-* headers)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        KnownIPNetworks = { },
+        KnownProxies = { }
+    });
 }
 
 app.UseHttpsRedirection();

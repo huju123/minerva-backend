@@ -26,8 +26,8 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
+# Default port when no platform PORT env var is set
 ENV ASPNETCORE_URLS=http://+:8080
-
 EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "Minerva_Backend.dll"]

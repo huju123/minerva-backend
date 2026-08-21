@@ -26,7 +26,7 @@ namespace Minerva_Backend.Helpers
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(
-                    Convert.ToDouble(_configuration["Jwt:DurationInMinutes"])),
+                    Convert.ToDouble(_configuration["Jwt:ExpiryMinutes"])),
                 signingCredentials: creds
             );
 
