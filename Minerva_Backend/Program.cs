@@ -22,6 +22,8 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IScoringService, ScoringService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<ICareerService, CareerService>();
+builder.Services.AddScoped<IJourney1Service, Journey1Service>();
+builder.Services.AddScoped<IJourney2Service, Journey2Service>();
 
 builder.Services.AddHttpClient<IJourney1BridgeService, Journey1BridgeService>(client =>
 {
