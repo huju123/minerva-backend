@@ -119,14 +119,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await Minerva_Backend.Helpers.AssessmentSeeder.SeedAssessmentQuestions(dbContext);
-    await Minerva_Backend.Helpers.CareerSeeder.SeedCareers(dbContext);
-}
-
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
