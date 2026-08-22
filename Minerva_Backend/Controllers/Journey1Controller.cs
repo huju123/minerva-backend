@@ -1,54 +1,62 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Minerva_Backend.DTO.Journey1;
 using Minerva_Backend.IServices;
 using System.Security.Claims;
 
-public class Journey1Controller(IJourney1Service _journey1Service) : ControllerBase
+namespace Minerva_Backend.Controllers
 {
-    private string? GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+    [Route("api/[controller]")]
+    [ApiController]
 
-    [HttpGet("GetJourney1Questions")]
-    public async Task<IActionResult> GetJourney1QuestionsAsync()
+
+    public class Journey1Controller(IJourney1Service _journey1Service) : ControllerBase
     {
-        var result = await _journey1Service.GetQuestions();
-        if (!result.Status)
-        {
-            return BadRequest(result);
-        }
-        return Ok(result);
-    }
+        private string? GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    [HttpPost("SubmitJourney1")]
-    public async Task<IActionResult> SubmitJourney1Async([FromBody] SubmitJourney1DTO dto)
-    {
-        var userId = GetUserId();
-        if (userId == null)
+        [HttpGet("GetJourney1Questions")]
+        public async Task<IActionResult> GetJourney1QuestionsAsync()
         {
-            return Unauthorized();
+            var result = await _journey1Service.GetQuestions();
+            if (!result.Status)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
-        var result = await _journey1Service.SubmitAssessment(userId, dto);
-        if (!result.Status)
+        [HttpPost("SubmitJourney1")]
+        public async Task<IActionResult> SubmitJourney1Async([FromBody] SubmitJourney1DTO dto)
         {
-            return BadRequest(result);
-        }
-        return Ok(result);
-    }
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
 
-    [HttpGet("GetJourney1Result/{assessmentId}")]
-    public async Task<IActionResult> GetJourney1ResultAsync(string assessmentId)
-    {
-        var userId = GetUserId();
-        if (userId == null)
-        {
-            return Unauthorized();
+            var result = await _journey1Service.SubmitAssessment(userId, dto);
+            if (!result.Status)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
-        var result = await _journey1Service.GetResult(userId, assessmentId);
-        if (!result.Status)
+        [HttpGet("GetJourney1Result/{assessmentId}")]
+        public async Task<IActionResult> GetJourney1ResultAsync(string assessmentId)
         {
-            return BadRequest(result);
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var result = await _journey1Service.GetResult(userId, assessmentId);
+            if (!result.Status)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
-        return Ok(result);
     }
 }
