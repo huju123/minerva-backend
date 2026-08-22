@@ -23,6 +23,16 @@ builder.Services.AddScoped<IScoringService, ScoringService>();
 builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<ICareerService, CareerService>();
 
+builder.Services.AddHttpClient<IJourney1BridgeService, Journey1BridgeService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ScoringService:BaseUrl"]!);
+});
+
+builder.Services.AddHttpClient<IJourney2BridgeService, Journey2BridgeService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ScoringService:BaseUrl"]!);
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

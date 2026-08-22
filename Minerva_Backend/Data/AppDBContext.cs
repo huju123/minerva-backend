@@ -51,4 +51,5 @@ public class AppDbContext : IdentityDbContext<AppUser>   // no <Guid> needed now
     public DbSet<CareerComparison> CareerComparisons { get; set; }
     public DbSet<Journey1Result> Journey1Results { get; set; }
     public DbSet<Journey2Result> Journey2Results { get; set; }
+    public DbSet<Journey1Question> Journey1Questions { get; set; }
 }
