@@ -103,6 +103,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHttpClient<IResumeBridgeService, ResumeBridgeService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ScoringService:BaseUrl"]!);
+});
+
+builder.Services.AddScoped<IResumeService, ResumeService>();
+
 // builder.Services.AddOpenApi();
 
 // Configure port for hosting platforms that set the PORT env var (Render, Railway, etc.)
