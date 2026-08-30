@@ -1,42 +1,48 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Minerva_Backend.IServices;
 using System.Security.Claims;
 
-public class ResumeController(IResumeService _resumeService) : ControllerBase
+namespace Minerva_Backend.Controllers
 {
-    private string? GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-    [HttpPost("UploadResume")]
-    public async Task<IActionResult> UploadResumeAsync(IFormFile file)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ResumeController(IResumeService _resumeService) : ControllerBase
     {
-        var userId = GetUserId();
-        if (userId == null)
+        private string? GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        [HttpPost("UploadResume")]
+        public async Task<IActionResult> UploadResumeAsync(IFormFile file)
         {
-            return Unauthorized();
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var result = await _resumeService.EvaluateResume(userId, file);
+            if (!result.Status)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
-        var result = await _resumeService.EvaluateResume(userId, file);
-        if (!result.Status)
+        [HttpGet("GetResumeResult")]
+        public async Task<IActionResult> GetResumeResultAsync()
         {
-            return BadRequest(result);
-        }
-        return Ok(result);
-    }
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
 
-    [HttpGet("GetResumeResult")]
-    public async Task<IActionResult> GetResumeResultAsync()
-    {
-        var userId = GetUserId();
-        if (userId == null)
-        {
-            return Unauthorized();
+            var result = await _resumeService.GetLatestResult(userId);
+            if (!result.Status)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
-
-        var result = await _resumeService.GetLatestResult(userId);
-        if (!result.Status)
-        {
-            return BadRequest(result);
-        }
-        return Ok(result);
     }
 }
