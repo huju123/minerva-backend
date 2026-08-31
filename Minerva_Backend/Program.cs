@@ -117,6 +117,13 @@ builder.Services.AddHttpClient<IRoute3BridgeService, Route3BridgeService>(client
 
 builder.Services.AddScoped<IRoute3Service, Route3Service>();
 
+builder.Services.AddHttpClient<IChatBridgeService, ChatBridgeService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ScoringService:BaseUrl"]!);
+});
+
+builder.Services.AddScoped<IChatService, ChatService>();
+
 // builder.Services.AddOpenApi();
 
 // Configure port for hosting platforms that set the PORT env var (Render, Railway, etc.)
