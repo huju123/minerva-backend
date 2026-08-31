@@ -124,6 +124,14 @@ builder.Services.AddHttpClient<IChatBridgeService, ChatBridgeService>(client =>
 
 builder.Services.AddScoped<IChatService, ChatService>();
 
+builder.Services.AddHttpClient<IInterviewBridgeService, InterviewBridgeService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ScoringService:BaseUrl"]!);
+});
+
+builder.Services.AddScoped<IInterviewService, InterviewService>();
+
+
 // builder.Services.AddOpenApi();
 
 // Configure port for hosting platforms that set the PORT env var (Render, Railway, etc.)
