@@ -10,6 +10,7 @@ using Minerva_Backend.Services;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using YourProject.Roadmap.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -130,6 +131,13 @@ builder.Services.AddHttpClient<IInterviewBridgeService, InterviewBridgeService>(
 });
 
 builder.Services.AddScoped<IInterviewService, InterviewService>();
+
+builder.Services.AddHttpClient<IRoadmapService, RoadmapService>(client =>
+{
+    // adjust host/port to wherever uvicorn is actually running
+    client.BaseAddress = new Uri("http://localhost:8000");
+    client.Timeout = TimeSpan.FromSeconds(60); // roadmap generation with Groq can take a few seconds
+});
 
 
 // builder.Services.AddOpenApi();
