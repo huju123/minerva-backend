@@ -6,11 +6,16 @@ using Minerva_Backend.GenericResponse;
 using Minerva_Backend.IServices;
 using Minerva_Backend.Models;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Minerva_Backend.Services
 {
     public class Journey1Service(AppDbContext _context, IJourney1BridgeService _bridge) : IJourney1Service
     {
+        // This identifies the question set in the scoring service. It is not the
+        // identifier of a user's saved assessment.
+        private const string ScoringAssessmentId = "minerva_career_discovery_v4";
+
         public async Task<ResponseResult<List<Journey1QuestionDTO>>> GetQuestions()
         {
             var questions = await _context.Journey1Questions.ToListAsync();
@@ -51,7 +56,10 @@ namespace Minerva_Backend.Services
                 .Select(a => (a.QuestionId, a.SelectedOption))
                 .ToList();
 
-            var result = await _bridge.CompleteAssessmentAsync(dto.AssessmentId, answerTuples);
+            // Do not trust or reuse the assessment id supplied by the client. A
+            // saved assessment must have its own identifier for every submission.
+            var assessmentId = Guid.NewGuid().ToString();
+            var result = await _bridge.CompleteAssessmentAsync(ScoringAssessmentId, answerTuples);
 
             if (result == null)
             {
@@ -63,11 +71,26 @@ namespace Minerva_Backend.Services
                 };
             }
 
+            var resultJson = JsonNode.Parse(JsonSerializer.Serialize(result))?.AsObject();
+            if (resultJson == null)
+            {
+                return new ResponseResult<object>
+                {
+                    Data = null,
+                    Message = "Journey 1 scoring service returned an invalid result.",
+                    Status = false,
+                };
+            }
+
+            // The scoring service returns its fixed template id. Replace it with
+            // the id of this user's saved assessment before returning or storing it.
+            resultJson["assessment_id"] = assessmentId;
+
             var journey1Result = new Journey1Result
             {
                 UserId = userId,
-                AssessmentId = dto.AssessmentId,
-                ResultJson = JsonSerializer.Serialize(result)
+                AssessmentId = assessmentId,
+                ResultJson = resultJson.ToJsonString()
             };
 
             _context.Journey1Results.Add(journey1Result);
@@ -75,7 +98,7 @@ namespace Minerva_Backend.Services
 
             return new ResponseResult<object>
             {
-                Data = result,
+                Data = resultJson,
                 Message = "Journey 1 assessment completed successfully.",
                 Status = true,
             };
