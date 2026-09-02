@@ -84,7 +84,23 @@ namespace Minerva_Backend.Services
 
             // The scoring service returns its fixed template id. Replace it with
             // the id of this user's saved assessment before returning or storing it.
-            resultJson["assessment_id"] = assessmentId;
+            // Handle the casing used by different scoring-service versions
+            // (assessment_id, assessment_Id, assessmentId, etc.).
+            var assessmentProperties = resultJson
+                .Select(property => property.Key)
+                .Where(key => key.Replace("_", "", StringComparison.Ordinal)
+                    .Equals("assessmentid", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var propertyName in assessmentProperties)
+            {
+                resultJson[propertyName] = assessmentId;
+            }
+
+            if (assessmentProperties.Count == 0)
+            {
+                resultJson["assessment_id"] = assessmentId;
+            }
 
             var journey1Result = new Journey1Result
             {
