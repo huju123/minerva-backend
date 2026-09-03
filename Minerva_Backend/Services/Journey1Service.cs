@@ -114,7 +114,7 @@ namespace Minerva_Backend.Services
 
             return new ResponseResult<object>
             {
-                Data = resultJson,
+                Data = new { assessmentId, result = resultJson },
                 Message = "Journey 1 assessment completed successfully.",
                 Status = true,
             };
