@@ -120,10 +120,10 @@ namespace Minerva_Backend.Services
             };
         }
 
-        public async Task<ResponseResult<object>> GetResult(string userId, string assessmentId)
+        public async Task<ResponseResult<object>> GetResult(string userId, string attemptId)
         {
             var result = await _context.Journey1Results
-                .Where(r => r.UserId == userId && r.AssessmentId == assessmentId)
+                .Where(r => r.Id == attemptId && r.UserId == userId)  // ← query by Id (GUID), not AssessmentId
                 .OrderByDescending(r => r.CreatedAt)
                 .FirstOrDefaultAsync();
 
@@ -132,7 +132,7 @@ namespace Minerva_Backend.Services
                 return new ResponseResult<object>
                 {
                     Data = null,
-                    Message = "No Journey 1 result found for this assessment.",
+                    Message = "No Journey 1 result found.",
                     Status = false,
                 };
             }
