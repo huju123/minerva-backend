@@ -120,10 +120,14 @@ namespace Minerva_Backend.Services
             };
         }
 
-        public async Task<ResponseResult<object>> GetResult(string userId, string attemptId)
+        public async Task<ResponseResult<object>> GetResult(
+    string userId,
+    string assessmentId)
         {
             var result = await _context.Journey1Results
-                .Where(r => r.Id == attemptId && r.UserId == userId)  // ← query by Id (GUID), not AssessmentId
+                .Where(r =>
+                    r.AssessmentId == assessmentId &&
+                    r.UserId == userId)
                 .OrderByDescending(r => r.CreatedAt)
                 .FirstOrDefaultAsync();
 
