@@ -1,5 +1,7 @@
 select * from AspNetUsers
+--delete from AspNetUsers where AspNetUsers.EmailConfirmed = 0
 select * from UserProfiles
+--delete from UserProfiles
 select * from AssessmentQuestions
 select * from AssessmentAnswers
 select * from AssessmentAttempts
