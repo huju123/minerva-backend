@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
 using Minerva_Backend.IServices;
 
 namespace Minerva_Backend.Services
@@ -7,11 +8,11 @@ namespace Minerva_Backend.Services
     {
         public async Task<object?> GetQuestionsAsync()
         {
-            // Python doesn't currently expose a separate "questions only" endpoint —
-            // it returns questions embedded in the assessment JSON it already loaded.
-            // See note below on how we handle this.
             var response = await _httpClient.GetAsync("/journey1/questions");
-            if (!response.IsSuccessStatusCode) return null;
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
             return await response.Content.ReadFromJsonAsync<object>();
         }
 
@@ -29,9 +30,55 @@ namespace Minerva_Backend.Services
                 })
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/journey1/exploring/complete", payload);
-            if (!response.IsSuccessStatusCode) return null;
-            return await response.Content.ReadFromJsonAsync<object>();
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync(
+                    "/journey1/exploring/complete",
+                    payload
+                );
+
+                var responseBody =
+                    await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine(
+                    "===== JOURNEY 1 PYTHON RESPONSE ====="
+                );
+
+                Console.WriteLine(
+                    $"Status Code: {(int)response.StatusCode} {response.StatusCode}"
+                );
+
+                Console.WriteLine(
+                    $"Response Body: {responseBody}"
+                );
+
+                Console.WriteLine(
+                    "======================================"
+                );
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+                return JsonSerializer.Deserialize<object>(
+                    responseBody
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "===== JOURNEY 1 PYTHON CONNECTION ERROR ====="
+                );
+
+                Console.WriteLine(ex.ToString());
+
+                Console.WriteLine(
+                    "============================================="
+                );
+
+                return null;
+            }
         }
     }
 }
