@@ -1,8 +1,10 @@
-﻿namespace Minerva_Backend.IServices
+﻿using Minerva_Backend.DTO.Interview;
+
+namespace Minerva_Backend.IServices
 {
     public interface IInterviewBridgeService
     {
-        public Task<object?> StartAsync(string targetRole, List<object> skillProfile, int numQuestions);
-        public Task<object?> EvaluateAsync(List<string> questions, List<string> answers, string targetRole);
+        public Task<List<QuestionDto>?> StartAsync(string targetRole, List<object> skillProfile, int numQuestions);
+        public Task<List<InterviewEvaluationDto>?> EvaluateAsync(List<QuestionDto> questions, List<InterviewAnswerDto> answers, string targetRole);
     }
 }

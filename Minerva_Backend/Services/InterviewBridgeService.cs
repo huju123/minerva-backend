@@ -1,11 +1,12 @@
 ﻿using System.Net.Http.Json;
+using Minerva_Backend.DTO.Interview;
 using Minerva_Backend.IServices;
 
 namespace Minerva_Backend.Services
 {
     public class InterviewBridgeService(HttpClient _httpClient) : IInterviewBridgeService
     {
-        public async Task<object?> StartAsync(string targetRole, List<object> skillProfile, int numQuestions)
+        public async Task<List<QuestionDto>?> StartAsync(string targetRole, List<object> skillProfile, int numQuestions)
         {
             var payload = new
             {
@@ -16,10 +17,12 @@ namespace Minerva_Backend.Services
 
             var response = await _httpClient.PostAsJsonAsync("/interview/start", payload);
             if (!response.IsSuccessStatusCode) return null;
-            return await response.Content.ReadFromJsonAsync<object>();
+
+            var wrapper = await response.Content.ReadFromJsonAsync<PythonResponseWrapper<List<QuestionDto>>>();
+            return wrapper?.Success == true ? wrapper.Data : null;
         }
 
-        public async Task<object?> EvaluateAsync(List<string> questions, List<string> answers, string targetRole)
+        public async Task<List<InterviewEvaluationDto>?> EvaluateAsync(List<QuestionDto> questions, List<InterviewAnswerDto> answers, string targetRole)
         {
             var payload = new
             {
@@ -30,7 +33,16 @@ namespace Minerva_Backend.Services
 
             var response = await _httpClient.PostAsJsonAsync("/interview/evaluate", payload);
             if (!response.IsSuccessStatusCode) return null;
-            return await response.Content.ReadFromJsonAsync<object>();
+
+            var wrapper = await response.Content.ReadFromJsonAsync<PythonResponseWrapper<List<InterviewEvaluationDto>>>();
+            return wrapper?.Success == true ? wrapper.Data : null;
         }
+    }
+
+    public class PythonResponseWrapper<T>
+    {
+        public bool Success { get; set; }
+        public T? Data { get; set; }
+        public string? Error { get; set; }
     }
 }

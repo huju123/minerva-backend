@@ -109,14 +109,16 @@ namespace Minerva_Backend.Services
             }
 
             // Deserialize stored questions
-            var questions = JsonSerializer.Deserialize<List<string>>(attempt.QuestionsJson)!;
+            var questions = JsonSerializer.Deserialize<List<QuestionDto>>(attempt.QuestionsJson)!;
 
-            if (dto.Answers.Count != questions.Count)
+            if (dto.Answers.Count != questions.Count ||
+                !dto.Answers.Select(a => a.Id).OrderBy(x => x)
+                    .SequenceEqual(questions.Select(q => q.Id).OrderBy(x => x)))
             {
                 return new ResponseResult<object>
                 {
                     Data = null,
-                    Message = $"Expected {questions.Count} answers but received {dto.Answers.Count}.",
+                    Message = "Submitted answers do not match the interview's questions.",
                     Status = false,
                 };
             }
