@@ -1,32 +1,23 @@
-# =========================
-# Build stage
-# =========================
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY ["Minerva_Backend.csproj", "./"]
-
-RUN dotnet restore "Minerva_Backend.csproj"
+COPY ["Minerva_Backend/Minerva_Backend.csproj", "Minerva_Backend/"]
+RUN dotnet restore "Minerva_Backend/Minerva_Backend.csproj"
 
 COPY . .
+WORKDIR /src/Minerva_Backend
 
 RUN dotnet publish "Minerva_Backend.csproj" \
-    -c Release \
-    -o /app/publish \
+    --configuration Release \
+    --output /app/publish \
     /p:UseAppHost=false
 
-
-# =========================
-# Runtime stage
-# =========================
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
-
 WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Default port when no platform PORT env var is set
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
